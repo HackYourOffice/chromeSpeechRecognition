@@ -15,15 +15,21 @@ function httpGetAsync(theUrl, callback)
   xmlHttp.send();
 }
 
-const commands = {
-  help: 'welche Kommandos gibt es',
-  beerAllowed: 'darf ich schon Bier trinken',
-  roomNames: 'welche Räume gibt es',
-  tempPokerraum: 'wie warm ist es in Pokerraum',
-  tempWerkstatt: 'wie warm ist es in der Werkstatt',
-  time: 'wie spät ist es',
-  fuck: 'f*** dich'
-};
+
+class Command {
+
+  constructor(name, doFn) {
+    this.name = name;
+    this.doFn = doFn;
+  }
+
+  do() {
+    this.doFn();
+  }
+}
+
+window.commandList = [];
+
 
 const output = document.getElementById('output');
 const ask = document.getElementById('ask');
@@ -70,64 +76,11 @@ const recognize = () => {
       console.log('finished');
       console.log(msg); //erstes Ergebnis ausgeben
 
-      if (msg === commands.beerAllowed) {
-        say('zum wohl');
-      }
-
-      // http://www.icndb.com/api/
-      if (msg === 'erzähl einen Witz') {
-        httpGetAsync('http://api.icndb.com/jokes/random', (event) => {
-          console.log('result: ', event);
-          console.log(typeof event);
-          const joke = event.value.joke;
-
-          console.log(joke);
-          say(joke, 'en');
-        });
-      }
-
-      if (msg === commands.roomNames) {
-
-        httpGetAsync('http://openhab-test.synyx.coffee:8080/rest/items/', (event) => {
-          console.log(event);
-          const rooms = event.map(e => {
-            return e.name;
-          }).filter(e => e.endsWith('Temperature_Current'))
-            .forEach(e => {
-              const room = e.split('_')[0];
-              if (room !== 'Group') {
-                say(room)
-              }
-            });
-
-        });
-      }
-
-      if (msg === commands.tempPokerraum) {
-        sayRoomTemperature('Pokerraum');
-      }
-
-      if (msg === commands.tempWerkstatt) {
-        sayRoomTemperature('Werkstatt');
-      }
-
-      if (msg === commands.help) {
-        say('es gibt folgende Befehle');
-        Object.keys(commands).forEach(cmd => {
-          say(commands[cmd]);
-        });
-      }
-
-      if (msg === commands.time) {
-        const now = new Date();
-        const hour = now.getHours();
-        const min = now.getMinutes();
-        say(`Es ist ${hour} Uhr ${min}`);
-      }
-
-      if (msg === commands.fuck) {
-        say('Fick Dich selber');
-      }
+      window.commandList.forEach(cmd => {
+        if (msg === cmd.name) {
+          cmd.do();
+        }
+      });
     }
   };
 
