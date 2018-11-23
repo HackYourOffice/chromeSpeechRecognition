@@ -11,6 +11,8 @@
 
 <button id="ask">ask</button>
 
+<button id="start">start</button>
+
 <script>
 
   function httpGetAsync(theUrl, callback)
@@ -32,11 +34,13 @@
     beerAllowed: 'darf ich schon Bier trinken',
     roomNames: 'welche Räume gibt es',
     tempPokerraum: 'wie warm ist es in Pokerraum',
-    tempWerkstatt: 'wie warm ist es in der Werkstatt'
+    tempWerkstatt: 'wie warm ist es in der Werkstatt',
+    time: 'wie spät ist es'
   };
 
     const output = document.getElementById('output');
     const ask = document.getElementById('ask');
+    const start = document.getElementById('start');
     const messages = [];
 
     console.log('test');
@@ -45,6 +49,8 @@
     var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent;
 
     const say = (text, lang = 'de') => {
+
+      console.debug(`say: ${text}`);
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang; //Sprache auf Deutsch festlegen
@@ -124,6 +130,13 @@
               say(commands[cmd]);
             });
           }
+
+          if (msg === commands.time) {
+            const now = new Date();
+            const hour = now.getHours();
+            const min = now.getMinutes();
+            say(`Es ist ${hour} Uhr ${min}`);
+          }
         }
       };
 
@@ -136,7 +149,8 @@
         console.log('onaudioend ', event);
 
         setTimeout(() => {
-          //recognize();
+          recognized = false;
+          continousListen();
         }, 1000);
       };
 
@@ -145,6 +159,53 @@
 
   ask.addEventListener('click', () => {
     recognize();
+  });
+
+  let recognized = false;
+
+  const continousListen = () => {
+    const grammar = '#JSGF V1.0; grammar keyword; public <keyword> = hallo | test ;';
+    const recognition = new SpeechRecognition();
+    const speechRecognitionList = new SpeechGrammarList();
+    speechRecognitionList.addFromString(grammar, 1);
+    recognition.grammars = speechRecognitionList;
+    recognition.lang = 'de'; //Sprache auf Deutsch festlegen
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    recognition.onaudiostart = () => console.log('onaudiostart');
+    recognition.onaudioend = () => console.log('onaudio');
+    recognition.onspeechstart = () => console.log('onspeechstart');
+    recognition.onspeechend = () => console.log('onspeechend');
+    recognition.onsoundstart = () => console.log('onsoundstart');
+    recognition.onsoundend = () => console.log('onsoundend');
+    recognition.onstart = () => console.log('onstart');
+    recognition.onend = () => {
+      console.log('onend');
+
+      if (!recognized) {
+        setTimeout(continousListen, 1);
+      }
+
+    };
+    recognition.onerror = () => console.log('onerror');
+    recognition.onresult = (e) => {
+      const result = e.results[0][0];
+      console.log('onresult ', result);
+
+      if (result.transcript === 'Hallo Computer') {
+        recognized = true;
+        say('Ja?');
+        recognize();
+      }
+    };
+
+    recognition.start();
+  };
+recognized = false;
+  start.addEventListener('click', () => {
+    recognized = false;
+    continousListen();
   });
 
 </script>
