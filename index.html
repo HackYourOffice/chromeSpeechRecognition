@@ -27,6 +27,14 @@
     xmlHttp.send();
   }
 
+  const commands = {
+    help: 'welche Kommandos gibt es',
+    beerAllowed: 'darf ich schon Bier trinken',
+    roomNames: 'welche Räume gibt es',
+    tempPokerraum: 'wie warm ist es in Pokerraum',
+    tempWerkstatt: 'wie warm ist es in der Werkstatt'
+  };
+
     const output = document.getElementById('output');
     const ask = document.getElementById('ask');
     const messages = [];
@@ -69,7 +77,7 @@
           console.log('finished');
           console.log(msg); //erstes Ergebnis ausgeben
 
-          if (msg === 'darf ich schon Bier trinken') {
+          if (msg === commands.beerAllowed) {
             say('zum wohl');
           }
 
@@ -85,7 +93,7 @@
             });
           }
 
-          if (msg === 'welche Räume gibt es') {
+          if (msg === commands.roomNames) {
 
             httpGetAsync('http://openhab-test.synyx.coffee:8080/rest/items/', (event) => {
               console.log(event);
@@ -102,12 +110,19 @@
             });
           }
 
-          if (msg === 'wie warm ist es in Pokerraum') {
+          if (msg === commands.tempPokerraum) {
             sayRoomTemperature('Pokerraum');
           }
 
-          if (msg === 'wie warm ist es in der Werkstatt') {
+          if (msg === commands.tempWerkstatt) {
             sayRoomTemperature('Werkstatt');
+          }
+
+          if (msg === commands.help) {
+            say('es gibt folgende Befehle');
+            Object.keys(commands).forEach(cmd => {
+              say(commands[cmd]);
+            });
           }
         }
       };
