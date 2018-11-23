@@ -18,9 +18,17 @@ function httpGetAsync(theUrl, callback)
 
 class Command {
 
-  constructor(name, doFn) {
+  constructor(name, doFn, hitFn) {
     this.name = name;
+    this.hitFn = hitFn;
     this.doFn = doFn;
+  }
+
+  hit(text) {
+    if (typeof this.hitFn === 'function') {
+      return this.hitFn(text);
+    }
+    return text === this.name;
   }
 
   do() {
@@ -77,7 +85,7 @@ const recognize = () => {
       console.log(msg); //erstes Ergebnis ausgeben
 
       window.commandList.forEach(cmd => {
-        if (msg === cmd.name) {
+        if (cmd.hit(msg)) {
           cmd.do();
         }
       });

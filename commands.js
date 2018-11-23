@@ -5,6 +5,11 @@ window.commandList.push(new Command('welche Kommandos gibt es', () => {
   window.commandList.forEach(cmd => {
     say(cmd.name);
   });
+}, (text) => {
+  if (text === 'Hilfe' || text === this.name) {
+    return true;
+  }
+  return false;
 }));
 
 window.commandList.push(new Command('darf ich schon Bier trinken', () => {
