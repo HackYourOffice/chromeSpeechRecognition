@@ -15,6 +15,11 @@
 
 <script>
 
+
+
+  let recognized = false;
+  let continousListenOn = false;
+
   function httpGetAsync(theUrl, callback)
   {
     var xmlHttp = new XMLHttpRequest();
@@ -35,7 +40,8 @@
     roomNames: 'welche Räume gibt es',
     tempPokerraum: 'wie warm ist es in Pokerraum',
     tempWerkstatt: 'wie warm ist es in der Werkstatt',
-    time: 'wie spät ist es'
+    time: 'wie spät ist es',
+    fuck: 'f*** dich'
   };
 
     const output = document.getElementById('output');
@@ -137,6 +143,10 @@
             const min = now.getMinutes();
             say(`Es ist ${hour} Uhr ${min}`);
           }
+
+          if (msg === commands.fuck) {
+            say('Fick Dich selber');
+          }
         }
       };
 
@@ -149,8 +159,10 @@
         console.log('onaudioend ', event);
 
         setTimeout(() => {
-          recognized = false;
-          continousListen();
+          if (continousListenOn) {
+            recognized = false;
+            continousListen();
+          }
         }, 1000);
       };
 
@@ -158,10 +170,9 @@
     };
 
   ask.addEventListener('click', () => {
+    continousListenOn = false;
     recognize();
   });
-
-  let recognized = false;
 
   const continousListen = () => {
     const grammar = '#JSGF V1.0; grammar keyword; public <keyword> = hallo | test ;';
@@ -196,7 +207,8 @@
       if (result.transcript === 'Hallo Computer') {
         recognized = true;
         say('Ja?');
-        recognize();
+        setTimeout(recognize, 1000);
+
       }
     };
 
@@ -204,6 +216,7 @@
   };
 recognized = false;
   start.addEventListener('click', () => {
+    continousListenOn = true;
     recognized = false;
     continousListen();
   });
