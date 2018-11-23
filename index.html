@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+<head>
+</head>
+
+<body>
+<h1>Speech</h1>
+
+<textarea id="output"></textarea>
+
+<button id="ask">ask</button>
+
+<script>
+
+  function httpGetAsync(theUrl, callback)
+  {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+      if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        var jsonData = JSON.parse(xmlHttp.responseText);
+        callback(jsonData);
+      }
+    };
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous
+
+    xmlHttp.send();
+  }
+
+    const output = document.getElementById('output');
+    const ask = document.getElementById('ask');
+    const messages = [];
+
+    console.log('test');
+    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+    var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+    var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent;
+
+    const say = (text, lang = 'de') => {
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang; //Sprache auf Deutsch festlegen
+      speechSynthesis.speak(utterance);
+    };
+
+    const sayRoomTemperature = (roomName) => {
+      // chrome CORS plugin needed
+      httpGetAsync(`http://openhab-test.synyx.coffee:8080/rest/items/${roomName}_Temperature_Current`, (event) => {
+        console.log(event.state);
+        const temperature = event.state;
+        const room = event.name.split('_')[0];
+        say(`Es sind ${temperature} Grad`);
+      });
+    };
+
+    const recognize = () => {
+      console.log('start recognition');
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'de'; //Sprache auf Deutsch festlegen
+
+      recognition.onresult = function (event) {
+        if (event.results.length > 0) {
+          const msg = event.results[0][0].transcript;
+          messages.push(msg);
+
+          output.innerText = JSON.stringify(messages);
+
+          console.log('finished');
+          console.log(msg); //erstes Ergebnis ausgeben
+
+          if (msg === 'darf ich schon Bier trinken') {
+            say('zum wohl');
+          }
+
+          // http://www.icndb.com/api/
+          if (msg === 'erzähl einen Witz') {
+            httpGetAsync('http://api.icndb.com/jokes/random', (event) => {
+              console.log('result: ', event);
+              console.log(typeof event);
+              const joke = event.value.joke;
+
+              console.log(joke);
+              say(joke, 'en');
+            });
+          }
+
+          if (msg === 'welche Räume gibt es') {
+
+            httpGetAsync('http://openhab-test.synyx.coffee:8080/rest/items/', (event) => {
+              console.log(event);
+              const rooms = event.map(e => {
+                return e.name;
+              }).filter(e => e.endsWith('Temperature_Current'))
+                .forEach(e => {
+                  const room = e.split('_')[0];
+                  if (room !== 'Group') {
+                    say(room)
+                  }
+                });
+
+            });
+          }
+
+          if (msg === 'wie warm ist es in Pokerraum') {
+            sayRoomTemperature('Pokerraum');
+          }
+
+          if (msg === 'wie warm ist es in der Werkstatt') {
+            sayRoomTemperature('Werkstatt');
+          }
+        }
+      };
+
+
+      recognition.onaudiostart = function(event) {
+        console.log('onaudiostart ', event);
+      };
+
+      recognition.onaudioend = function(event) {
+        console.log('onaudioend ', event);
+
+        setTimeout(() => {
+          //recognize();
+        }, 1000);
+      };
+
+      recognition.start();
+    };
+
+  ask.addEventListener('click', () => {
+    recognize();
+  });
+
+</script>
+</body>
+</html>
