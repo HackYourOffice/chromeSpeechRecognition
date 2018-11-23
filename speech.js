@@ -1,12 +1,11 @@
 let recognized = false;
 let continousListenOn = false;
 
-function httpGetAsync(theUrl, callback)
-{
-  var xmlHttp = new XMLHttpRequest();
+function httpGetAsyncJson(theUrl, callback) {
+  const xmlHttp = new XMLHttpRequest();
   xmlHttp.onreadystatechange = function() {
     if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-      var jsonData = JSON.parse(xmlHttp.responseText);
+      const jsonData = JSON.parse(xmlHttp.responseText);
       callback(jsonData);
     }
   };
@@ -15,6 +14,17 @@ function httpGetAsync(theUrl, callback)
   xmlHttp.send();
 }
 
+function httpGetAsyncText(theUrl, callback) {
+  const xmlHttp = new XMLHttpRequest();
+  xmlHttp.onreadystatechange = function() {
+    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+      callback(xmlHttp.responseText);
+    }
+  };
+  xmlHttp.open("GET", theUrl, true); // true for asynchronous
+
+  xmlHttp.send();
+}
 
 class Command {
 
@@ -60,7 +70,7 @@ const say = (text, lang = 'de') => {
 
 const sayRoomTemperature = (roomName) => {
   // chrome CORS plugin needed
-  httpGetAsync(`http://openhab-test.synyx.coffee:8080/rest/items/${roomName}_Temperature_Current`, (event) => {
+  httpGetAsyncJson(`http://openhab-test.synyx.coffee:8080/rest/items/${roomName}_Temperature_Current`, (event) => {
     console.log(event.state);
     const temperature = event.state;
     const room = event.name.split('_')[0];

@@ -13,7 +13,14 @@ window.commandList.push(new Command('welche Kommandos gibt es', () => {
 }));
 
 window.commandList.push(new Command('darf ich schon Bier trinken', () => {
-  say('zum wohl');
+  httpGetAsyncText('https://bier.synyx.de/', (text) => {
+
+    if (text.includes('Is it beertime yet? - YES')) {
+      say('zum wohl');
+    } else {
+      say('nö');
+    }
+  });
 }));
 
 window.commandList.push(new Command('wie warm ist es in Pokerraum', () => {
@@ -31,7 +38,7 @@ window.commandList.push(new Command('f*** dich', () => {
 
 window.commandList.push(new Command('erzähl einen Witz', () => {
   // http://www.icndb.com/api/
-  httpGetAsync('http://api.icndb.com/jokes/random', (event) => {
+  httpGetAsyncJson('http://api.icndb.com/jokes/random', (event) => {
     console.log('result: ', event);
     console.log(typeof event);
     const joke = event.value.joke;
@@ -49,7 +56,7 @@ window.commandList.push(new Command('wie spät ist es', () => {
 }));
 
 window.commandList.push(new Command('welche Räume gibt es', () => {
-  httpGetAsync('http://openhab-test.synyx.coffee:8080/rest/items/', (event) => {
+  httpGetAsyncJson('http://openhab-test.synyx.coffee:8080/rest/items/', (event) => {
     console.log(event);
     const rooms = event.map(e => {
       return e.name;
