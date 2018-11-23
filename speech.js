@@ -151,7 +151,7 @@ const continousListen = () => {
     }
 
   };
-  recognition.onerror = () => console.log('onerror');
+  recognition.onerror = (e) => console.log('onerror ', e);
   recognition.onresult = (e) => {
     const result = e.results[0][0];
     console.log('onresult ', result);
