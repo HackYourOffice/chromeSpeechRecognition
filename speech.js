@@ -91,14 +91,23 @@ const recognize = () => {
 
       output.innerText = JSON.stringify(messages);
 
-      console.log('finished');
+      console.log('finished: ', msg);
       console.log(msg); //erstes Ergebnis ausgeben
 
-      window.commandList.forEach(cmd => {
+      const cmdRecognized = window.commandList.some(cmd => {
         if (cmd.hit(msg)) {
           cmd.do();
+          return true;
         }
+        return false;
       });
+
+      if (!cmdRecognized) {
+        const cmd = window.commandList.filter(cmd => cmd.name === 'UPS');
+        if (cmd) {
+          cmd[0].do();
+        }
+      }
     }
   };
 
