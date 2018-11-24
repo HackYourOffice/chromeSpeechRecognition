@@ -1,6 +1,22 @@
 let recognized = false;
 let continousListenOn = false;
 
+function httpGetAsyncJsonFromBahn(theUrl, callback) {
+  const xmlHttp = new XMLHttpRequest();
+  xmlHttp.onreadystatechange = function() {
+    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+      const jsonData = JSON.parse(xmlHttp.responseText);
+      callback(jsonData);
+    }
+  };
+  xmlHttp.open("GET", theUrl, true); // true for asynchronous
+
+  xmlHttp.setRequestHeader('Authorization', 'Bearer 676d050c501071f9e11a0c177da4d7da');
+  xmlHttp.setRequestHeader('Accept', 'application/json');
+
+  xmlHttp.send();
+}
+
 function httpGetAsyncJson(theUrl, callback) {
   const xmlHttp = new XMLHttpRequest();
   xmlHttp.onreadystatechange = function() {
@@ -67,6 +83,8 @@ const say = (text, lang = 'de') => {
   utterance.lang = lang; //Sprache auf Deutsch festlegen
   speechSynthesis.speak(utterance);
 };
+
+//say('Hallo Welt');
 
 const sayRoomTemperature = (roomName) => {
   // chrome CORS plugin needed

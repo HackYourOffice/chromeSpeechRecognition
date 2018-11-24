@@ -10,3 +10,7 @@ Quellen:
 
 Firefox is not supported at the moment:
 * https://bugzilla.mozilla.org/show_bug.cgi?id=1248897
+
+Chromium:
+* https://askubuntu.com/questions/761975/chromium-is-not-generating-voice
+chromium-browser --enable-speech-dispatcher

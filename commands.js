@@ -101,3 +101,21 @@ window.commandList.push(new Command('wie ist das Wetter', () => {
     console.log('error in geo location');
   });
 }));
+
+
+window.commandList.push(new Command('wo ist das nächste Reisezentrum', () => {
+  // https://developer.deutschebahn.com/store/apis/info?name=Reisezentren&version=v1&provider=DBOpenData#!/default/get_reisezentren_loc_lat_lon
+  navigator.geolocation.getCurrentPosition((position) => {
+    const lat = position.coords.latitude; //49
+    const lon = position.coords.longitude; //8
+
+    httpGetAsyncJsonFromBahn(`https://api.deutschebahn.com/reisezentren/v1/reisezentren/loc/${lat}/${lon}`, (json) => {
+      const name = json.name;
+      const dist = Number.parseInt(json.dist);
+      const addr = json.address;
+      const city = json.city;
+      say(`Das nächste Reisezentrum ist ${dist} km entfernt in der ${addr} in ${city}`);
+    });
+  });
+}));
+
