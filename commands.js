@@ -83,3 +83,21 @@ window.commandList.push(new Command('UPS', () => {
   }
 }));
 
+
+window.commandList.push(new Command('wie ist das Wetter', () => {
+  navigator.geolocation.getCurrentPosition((position) => {
+    const lat = position.coords.latitude; //49
+    const lon = position.coords.longitude; //8
+
+    httpGetAsyncJson(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}8&lon=${lon}&appid=237cd23c72575576cdab347b7c01a3f8&lang=de`, (json) => {
+      const city = json.name;
+      const weather = json.weather[0].description;
+      const temp = Number.parseInt(json.main.temp - 273);
+      const humi = json.main.humidity;
+
+      say(`In ${city} ist das Wetter ${weather} bei ${temp} Grad Celsius und einer Luftfeuchte von ${humi}%`)
+    })
+  }, () => {
+    console.log('error in geo location');
+  });
+}));
