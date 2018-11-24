@@ -71,3 +71,15 @@ window.commandList.push(new Command('welche Räume gibt es', () => {
   });
 }));
 
+window.commandList.push(new Command('UPS', () => {
+  const rand = Number.parseInt(Math.random() * 7) + 1;
+  const url = `https://www.soundjay.com/human/fart-0${rand}.mp3`;
+  console.log(url);
+  const audio = new Audio(url);
+  audio.play();
+}, (text) => {
+  if (['Pups', 'UPS'].includes(text)) {
+    return true;
+  }
+}));
+
