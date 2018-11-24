@@ -6,6 +6,9 @@ you can try out this directly https://hackyouroffice.github.io/chromeSpeechRecog
 * firefox is mission speech recognition
 * chromium is mission speech output
 
+You can click on *ask* to make to make a single request. Or you click on *start* to have a continuous listening where you can start with "Hallo Computer" a small conversation.
+In both cases "Hilfe" will provide you with a list of commands you can ask. Some of the commands are only working inside the synyx-network.
+
 
 Quellen:
 
