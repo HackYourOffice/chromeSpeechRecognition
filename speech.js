@@ -68,6 +68,8 @@ window.commandList = [];
 const output = document.getElementById('output');
 const ask = document.getElementById('ask');
 const start = document.getElementById('start');
+const input = document.getElementById('input');
+const read = document.getElementById('read');
 const messages = [];
 
 console.log('test');
@@ -198,4 +200,12 @@ start.addEventListener('click', () => {
   continousListenOn = true;
   recognized = false;
   continousListen();
+});
+
+read.addEventListener('click', () => {
+  const texts = input.value.split('. ');
+  console.log(texts);
+  texts.forEach(text => {
+    say(`${text}.`);
+  });
 });
